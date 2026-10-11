@@ -50,4 +50,4 @@ The app creates `instance/research_assistant.sqlite3` and stores uploaded PDFs i
 
 Run automated checks with `.\.venv\Scripts\python.exe -m unittest discover -s tests -v` on Windows, or `.venv/bin/python -m unittest discover -s tests -v` on macOS/Linux. The workflow test uses a temporary database and mocks external services, so it does not change your Library or spend API quota.
 
-Follow [DEMO_PLAN.md](DEMO_PLAN.md) for the required video walkthrough. Compare AI summaries and answers with the cited PDF pages; model output is not guaranteed to be correct.
+For the required video, demonstrate searching, saving, uploading, summarizing, and asking a paper question. Compare AI summaries and answers with the cited PDF pages; model output is not guaranteed to be correct.
