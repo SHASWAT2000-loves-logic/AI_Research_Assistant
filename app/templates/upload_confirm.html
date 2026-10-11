@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Review uploaded paper{% endblock %}
+
+{% block content %}
+<section class="page-card">
+    <p class="eyebrow">Review metadata</p>
+    <h1>Check the extracted details</h1>
+    <p>PDF layouts vary, so correct any fields before adding this paper to your library.</p>
+
+    <form class="form-stack" method="post" action="{{ url_for('confirm_upload') }}">
+        <input type="hidden" name="stored_filename" value="{{ metadata.stored_filename }}">
+
+        <label for="title">Title</label>
+        <input id="title" name="title" type="text" value="{{ metadata.title }}" required>
+
+        <label for="authors">Authors</label>
+        <input id="authors" name="authors" type="text" value="{{ metadata.authors }}">
+
+        <label for="publication_year">Publication year</label>
+        <input
+            id="publication_year"
+            name="publication_year"
+            type="number"
+            min="1800"
+            max="2100"
+            value="{{ metadata.publication_year or '' }}"
+        >
+
+        <label for="abstract">Abstract</label>
+        <textarea id="abstract" name="abstract" rows="10">{{ metadata.abstract }}</textarea>
+
+        <div class="form-actions">
+            <a class="secondary-link" href="{{ url_for('upload') }}">Choose another PDF</a>
+            <button type="submit">Save to library</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

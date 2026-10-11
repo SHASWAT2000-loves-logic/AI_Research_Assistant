@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Library{% endblock %}
+
+{% block content %}
+<section class="page-card">
+    <p class="eyebrow">Saved papers</p>
+    <h1>Your library</h1>
+    <p>Papers saved from arXiv remain available after refreshing or restarting the application.</p>
+</section>
+
+{% if message %}
+<div class="message message-success" role="status">{{ message }}</div>
+{% endif %}
+
+{% if papers %}
+<section class="results-section">
+    <div class="results-list">
+        {% for paper in papers %}
+        <article class="paper-card">
+            <div class="paper-meta">
+                <span>{{ paper.publication_year or "Year unavailable" }}</span>
+                {% if paper.external_id %}<span>arXiv:{{ paper.external_id }}</span>{% endif %}
+                {% if paper.source == "upload" %}<span>Uploaded PDF</span>{% endif %}
+            </div>
+            <h3>
+                <a class="paper-title-link" href="{{ url_for('paper_detail', paper_id=paper.id) }}">
+                    {{ paper.title }}
+                </a>
+            </h3>
+            <p class="authors">{{ paper.authors or "Authors unavailable" }}</p>
+            <p class="abstract abstract-preview">{{ paper.abstract or "No abstract available." }}</p>
+            <a class="details-link" href="{{ url_for('paper_detail', paper_id=paper.id) }}">View saved paper</a>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% else %}
+<div class="empty-state">No saved papers yet. Search arXiv and save one to begin your library.</div>
+{% endif %}
+{% endblock %}

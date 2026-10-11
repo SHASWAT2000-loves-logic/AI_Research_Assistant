@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Upload{% endblock %}
+
+{% block content %}
+<section class="page-card">
+    <p class="eyebrow">Local papers</p>
+    <h1>Upload a PDF</h1>
+    <p>Upload a text-based research paper. You can review its extracted metadata before saving it.</p>
+
+    {% if error %}
+    <div class="message message-error" role="alert">{{ error }}</div>
+    {% endif %}
+
+    <form class="form-stack" method="post" enctype="multipart/form-data">
+        <label for="paper">Choose a paper</label>
+        <input id="paper" name="paper" type="file" accept="application/pdf,.pdf" required>
+        <p class="field-help">PDF files up to 20 MB are supported.</p>
+        <button type="submit">Upload and review</button>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Search{% endblock %}
+
+{% block content %}
+<section class="page-card">
+    <p class="eyebrow">Discover</p>
+    <h1>Search research papers</h1>
+    <p>Find papers from arXiv by research topic or keyword.</p>
+    <form class="search-form" method="get" action="{{ url_for('search') }}">
+        <label for="query">Research topic or keywords</label>
+        <div class="input-row">
+            <input
+                id="query"
+                name="query"
+                type="search"
+                value="{{ query }}"
+                placeholder="e.g. retrieval augmented generation"
+                required
+            >
+            <button type="submit">Search</button>
+        </div>
+    </form>
+</section>
+
+{% if error %}
+<div class="message message-error" role="alert">{{ error }}</div>
+{% endif %}
+
+{% if results is not none %}
+<section class="results-section" aria-live="polite">
+    <div class="results-heading">
+        <p class="eyebrow">arXiv results</p>
+        <h2>{{ results|length }} paper{% if results|length != 1 %}s{% endif %} found</h2>
+    </div>
+
+    {% if results %}
+        <div class="results-list">
+            {% for paper in results %}
+            <article class="paper-card">
+                <div class="paper-meta">
+                    <span>{{ paper.publication_year or "Year unavailable" }}</span>
+                    <span>arXiv:{{ paper.arxiv_id }}</span>
+                </div>
+                <h3>{{ paper.title }}</h3>
+                <p class="authors">
+                    {{ paper.authors|join(", ") if paper.authors else "Authors unavailable" }}
+                </p>
+                <p class="abstract">{{ paper.abstract or "No abstract available." }}</p>
+                <div class="paper-actions">
+                    <div class="paper-links">
+                        {% if paper.abstract_url %}
+                        <a href="{{ paper.abstract_url }}" target="_blank" rel="noopener noreferrer">View on arXiv</a>
+                        {% endif %}
+                        {% if paper.pdf_url %}
+                        <a href="{{ paper.pdf_url }}" target="_blank" rel="noopener noreferrer">Open PDF</a>
+                        {% endif %}
+                    </div>
+                    <form method="post" action="{{ url_for('save_to_library') }}">
+                        <input type="hidden" name="external_id" value="{{ paper.arxiv_id }}">
+                        <input type="hidden" name="title" value="{{ paper.title }}">
+                        <input type="hidden" name="authors" value="{{ paper.authors|join(', ') }}">
+                        <input type="hidden" name="publication_year" value="{{ paper.publication_year or '' }}">
+                        <input type="hidden" name="abstract" value="{{ paper.abstract }}">
+                        <input type="hidden" name="paper_url" value="{{ paper.abstract_url }}">
+                        <button type="submit">Save to library</button>
+                    </form>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">No papers matched your search.</div>
+    {% endif %}
+</section>
+
+<script>
+    window.history.replaceState(null, document.title, "{{ url_for('search') }}");
+</script>
+{% endif %}
+{% endblock %}

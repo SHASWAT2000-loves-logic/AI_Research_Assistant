@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}{{ paper.title }}{% endblock %}
+
+{% block content %}
+<article class="page-card paper-detail">
+    <a class="back-link" href="{{ url_for('library') }}">&larr; Back to library</a>
+    <div class="paper-meta detail-meta">
+        <span>{{ paper.publication_year or "Year unavailable" }}</span>
+        {% if paper.external_id %}<span>arXiv:{{ paper.external_id }}</span>{% endif %}
+        {% if paper.source == "upload" %}<span>Uploaded PDF</span>{% endif %}
+    </div>
+    <h1>{{ paper.title }}</h1>
+    <p class="authors">{{ paper.authors or "Authors unavailable" }}</p>
+
+    <section class="detail-section">
+        <h2>Abstract</h2>
+        <p class="abstract">{{ paper.abstract or "No abstract available." }}</p>
+    </section>
+
+    <section class="detail-section preparation-section" id="preparation">
+        <h2>Prepare for AI</h2>
+        <p>Extract the full PDF text by page and save it as manageable chunks for AI features.</p>
+
+        {% if preparation_error %}
+        <div class="message message-error" role="alert">{{ preparation_error }}</div>
+        {% endif %}
+
+        {% if preparation_message %}
+        <div class="message message-success" role="status">{{ preparation_message }}</div>
+        {% elif paper.chunk_count %}
+        <p class="preparation-status">
+            Ready for AI: {{ paper.chunk_count }} text chunk{% if paper.chunk_count != 1 %}s{% endif %} saved.
+        </p>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('prepare_saved_paper', paper_id=paper.id) }}">
+            <button type="submit">
+                {% if paper.chunk_count %}Prepare again{% else %}Prepare paper for AI{% endif %}
+            </button>
+        </form>
+    </section>
+
+    <section class="detail-section summary-section" id="summary">
+        <h2>AI summary</h2>
+
+        {% if summary_error %}
+        <div class="message message-error" role="alert">{{ summary_error }}</div>
+        {% endif %}
+
+        {% if paper.chunk_count %}
+        <p>Generate a summary from the prepared text of this paper.</p>
+
+        {% if summary_message %}
+        <div class="message message-success" role="status">{{ summary_message }}</div>
+        {% endif %}
+
+        {% if summary %}
+        <div class="summary-output">{{ summary.summary }}</div>
+        <p class="summary-meta">Generated with {{ summary.model }}.</p>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('summarize_saved_paper', paper_id=paper.id) }}">
+            <button type="submit">
+                {% if summary %}Generate summary again{% else %}Generate AI summary{% endif %}
+            </button>
+        </form>
+        {% else %}
+        <p class="field-help">Prepare this paper before generating its AI summary.</p>
+        <button type="button" disabled>Generate AI summary</button>
+        {% endif %}
+    </section>
+
+    <section class="detail-section question-section" id="questions">
+        <h2>Ask this paper</h2>
+
+        {% if question_error %}
+        <div class="message message-error" role="alert">{{ question_error }}</div>
+        {% endif %}
+
+        {% if paper.chunk_count %}
+        <p>Ask a question and receive an answer grounded in the prepared paper text.</p>
+        <form class="form-stack" method="post" action="{{ url_for('ask_saved_paper', paper_id=paper.id) }}#questions">
+            <label for="question">Your question</label>
+            <textarea
+                id="question"
+                name="question"
+                rows="3"
+                maxlength="1000"
+                placeholder="e.g. What are the paper's main limitations?"
+                required
+            >{{ question or "" }}</textarea>
+            <div class="form-actions">
+                <button type="submit">Ask question</button>
+            </div>
+        </form>
+
+        {% if answer %}
+        <div class="answer-output" aria-live="polite">
+            <p class="answer-question">{{ question }}</p>
+            <div>{{ answer }}</div>
+        </div>
+        {% endif %}
+        {% else %}
+        <p class="field-help">Prepare this paper before asking questions about it.</p>
+        <button type="button" disabled>Ask question</button>
+        {% endif %}
+    </section>
+
+    {% if paper.paper_url %}
+    <a class="primary-link" href="{{ paper.paper_url }}" target="_blank" rel="noopener noreferrer">
+        View original paper on arXiv
+    </a>
+    {% endif %}
+
+    {% if paper.pdf_path %}
+    <a class="primary-link" href="{{ url_for('paper_pdf', paper_id=paper.id) }}" target="_blank">
+        Open uploaded PDF
+    </a>
+    {% endif %}
+</article>
+{% endblock %}
