@@ -46,8 +46,28 @@ The app creates `instance/research_assistant.sqlite3` and stores uploaded PDFs i
 - `app/services/llm.py`: Gemini summary and paper question prompts.
 - `app/templates/`, `app/static/`: user interface.
 
-## Check and demonstrate
+## Tests and coverage
 
-Run automated checks with `.\.venv\Scripts\python.exe -m unittest discover -s tests -v` on Windows, or `.venv/bin/python -m unittest discover -s tests -v` on macOS/Linux. The workflow test uses a temporary database and mocks external services, so it does not change your Library or spend API quota.
+After creating the virtual environment in Setup, install the development dependencies and run all tests. On Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe -m coverage run --source=app -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe -m coverage report -m
+```
+
+On macOS or Linux:
+
+```sh
+.venv/bin/python -m pip install -r requirements-dev.txt
+.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python -m coverage run --source=app -m unittest discover -s tests -v
+.venv/bin/python -m coverage report -m
+```
+
+The coverage run also executes the full test suite. The tests use temporary databases and PDFs and mock arXiv and Gemini requests, so they do not change your Library or spend API quota. Coverage data is written to `.coverage`, which Git ignores.
+
+## Demo
 
 For the required video, demonstrate searching, saving, uploading, summarizing, and asking a paper question. Compare AI summaries and answers with the cited PDF pages; model output is not guaranteed to be correct.

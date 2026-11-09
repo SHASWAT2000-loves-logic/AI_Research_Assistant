@@ -1,6 +1,7 @@
 import os
 import re
 
+import httpx
 from google import genai
 from google.genai import errors
 
@@ -92,7 +93,7 @@ def _request_gemini(*, prompt, model, empty_response_message):
         )
     except errors.APIError as error:
         raise PaperAIError(_api_error_message(error, model)) from error
-    except (OSError, TimeoutError) as error:
+    except (OSError, TimeoutError, httpx.ConnectError, httpx.TimeoutException) as error:
         raise PaperAIError(
             "The app could not connect to Gemini. Check the connection and try again."
         ) from error
